@@ -1,0 +1,32 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/wjp/Desktop/workspace/eventual/src/eventual.hpp
+functional
+-
+list
+-
+memory
+-
+mutex
+-
+condition_variable
+-
+
+/Users/wjp/Desktop/workspace/eventual/src/test.cc
+eventual.hpp
+/Users/wjp/Desktop/workspace/eventual/src/eventual.hpp
+iostream
+-
+chrono
+-
+thread
+-
+random
+-
+
