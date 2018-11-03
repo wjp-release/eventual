@@ -1,4 +1,5 @@
-#include "eventual.hpp"
+#include "todo.hpp"
+#include "zero_copy_value.hpp"
 #include <iostream>
 #include <chrono>
 #include <thread>
@@ -181,13 +182,22 @@ void test3()
     )();
 }
 
+
+void test_zero_copy_value()
+{
+    zero_copy_value a;
+    cout<<"empty: "<<a.empty()<<endl;
+    cout<<"typename: "<<a.type()<<endl;
+
+    zero_copy_value b(123);
+    cout<<"type"<<b.type()<<endl;
+
+
+}
+
 int main()
 {
-    for(int i=0;i<10;i++){
-        cout<<"-----------------------\n";
-        cout<<"seq "<<i<<endl;
-        test3();
-    } 
+    test_zero_copy_value();
 
     cin.get();
     return 0;
