@@ -33,22 +33,29 @@ class zero_copy_value{
 public:
     // empty is a valid state
     zero_copy_value() : meta(nullptr){}
+    zero_copy_value(zero_copy_value&&d) : meta(nullptr)
+    {
+        // std::cout<<"ctor swap!\n";
+        meta.swap(d.meta);
+    }
     // none of these ctors & operators would actually make a copy
-    zero_copy_value(const zero_copy_value& d) : meta(d.meta){}
+    zero_copy_value(const zero_copy_value& d) : meta(d.meta){
+        // std::cout<<"ctor ref++\n";
+    }
     // rvalue to be swapped as they would be obsolete anyway
     zero_copy_value& operator= (zero_copy_value&&d) noexcept{
-        std::cout<<"swap!\n";
+        // std::cout<<"swap!\n";
         meta.swap(d.meta);
         return *this;
     }
     // increment ref count without making actual copy 
     zero_copy_value& operator= (const zero_copy_value& d) noexcept{
-        std::cout<<"ref++\n";
+        //std::cout<<"ref++\n";
         meta=d.meta;
         return *this;
     }
     // do we refer to the same meta object?
-    bool operator== (const zero_copy_value& d) noexcept{
+    bool operator== (const zero_copy_value& d) const noexcept{
         return meta.get()==d.meta.get();
     }
     bool operator!= (const zero_copy_value& d) const noexcept{
@@ -61,45 +68,48 @@ public:
     zero_copy_value& swap(zero_copy_value& d)
     {
         meta.swap(d.meta);
-        return this;
+        return *this;
     }
     // copy must be called in a very explicit way
-    zero_copy_value& copy()  //return a reference to another copy of *this
+    zero_copy_value copy()  //return a reference to another copy of *this
     {
         return zero_copy_value(meta->copy());
     } 
     // construct from any type
-    template<class T>
+    template<typename T>
     zero_copy_value(const T& value) : meta(std::make_shared<meta_any_t<T>>(value))
     {} 
     // assign any type
-    template<class T>
+    template<typename T>
     zero_copy_value& operator=(const T& value)
     {
         // reuse move ctor and template ctor won't introduce overhead
-        *this = std::move(zero_copy_value(value));
+        // dont't use std::move to explicitly create a rvalue though 
+        // std::move(zero_copy_value(value)) actually disables copy elision 
+        // see https://stackoverflow.com/questions/19267408/why-does-stdmove-prevent-rvo
+        *this = zero_copy_value(value);
         // meta=std::make_shared<meta_any_t<T>>(value);
         return *this;
     }
     // return typeid type name
     std::string type() 
     {
-        if(meta==nullptr) return std::string(typid(nullptr).name());
+        if(meta==nullptr) return std::string(typeid(nullptr).name());
         return meta->type_name();
     }
-
-    // template<class T>
-    // T data()
-    // {
-    //     if(type()==typeid(T).name()){
-    //         //no need for dynamic_cast, since we have checked type of T matches meta's 
-    //         auto meta_of_T=static_cast<meta_any_t<T>>(meta); 
-    //         return meta_of_T->data();
-    //     }
-    //     else{
-    //         throw std::runtime_error("T is not the type holded by this zero_copy_value");
-    //     }
-    // }
+    // recover zero_copy_value to a known type
+    template<class T>
+    T data()
+    {
+        if(type()==typeid(T).name()){
+            //no need for dynamic_cast, since we have checked type of T matches meta's 
+            auto meta_of_T=static_cast<meta_any_t<T>*>(meta.get()); 
+            return *(meta_of_T->data());
+        }
+        else{
+            throw std::runtime_error("T is not the type holded by this zero_copy_value");
+        }
+    }
 private:
     class meta_t{
     public:
@@ -110,18 +120,20 @@ private:
     // this ctor is only used to create a copy
     zero_copy_value(std::shared_ptr<meta_t> meta):meta(meta){}
 
-    template <class T>
+    template <typename T>
     class meta_any_t : public meta_t{
     public:
-        meta_any_t(const T& value): value(value) {}
+        meta_any_t(const T& v): value(v) {}
         std::string type_name() override{
             return std::string(typeid(T).name()); 
         }
         std::shared_ptr<meta_t> copy() override{
             return std::make_shared<meta_any_t<T>>(value);
         }
-        T data() noexcept const{
-            return value;
+        // cannot return value 
+        T* data()
+        {
+            return &value;
         }
     private:
         T value;

@@ -182,16 +182,37 @@ void test3()
     )();
 }
 
-
 void test_zero_copy_value()
 {
     zero_copy_value a;
-    cout<<"empty: "<<a.empty()<<endl;
-    cout<<"typename: "<<a.type()<<endl;
+    cout<<"a empty: "<<a.empty()<<endl; //1
+    cout<<"a typename: "<<a.type()<<endl; //Dn
 
     zero_copy_value b(123);
-    cout<<"type"<<b.type()<<endl;
+    cout<<"b typename: "<<b.type()<<endl; //i
+    cout<<"b data as int: "<<b.data<int>()<<endl; //123
 
+    zero_copy_value c(123.456);
+    cout<<"c typename: "<<c.type()<<endl; //d
+    cout<<"c data as double "<<c.data<double>()<<endl;
+    
+    zero_copy_value d = c; // ctor ref++ 
+    zero_copy_value e = c.copy(); // make a copy
+    cout<<"c==d: "<<(c==d) <<endl;
+    cout<<"e==c: "<<(c==e) <<endl;
+    cout<<"e typename: "<<e.type()<<endl; //d
+    cout<<"e data as double "<<e.data<double>()<<endl;
+
+    zero_copy_value f = 100; // construct from a specific type
+    cout<<"f typename: "<<f.type()<<endl; //i
+//    cout<<"f data as double "<<f.data<double>()<<endl; //throw exception (should be int)
+
+    f=e; //operator= lvalue ref
+    cout<<"f typename: "<<f.type()<<endl; //i
+    cout<<"f data as double "<<e.data<double>()<<endl;
+    f=e.copy(); // operator= rvalue!
+    cout<<"f typename: "<<f.type()<<endl; //i
+    cout<<"f data as double "<<e.data<double>()<<endl;
 
 }
 

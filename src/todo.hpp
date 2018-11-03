@@ -132,7 +132,7 @@ private:
         func on_reject;
     };
     struct meta_t{
-        meta_t(func init) : init(init), state(pending){}
+        meta_t(func init) : state(pending), init(init){}
         std::atomic<int> state;
         std::mutex mtx;
         std::condition_variable cv;
