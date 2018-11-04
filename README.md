@@ -1,6 +1,6 @@
 # eventual
 
-Eventual is an asyncrhonous programming framework for modern C++.
+Eventual is an asynchronous programming framework for modern C++.
 
 ### Promises/A+ in C++
 
