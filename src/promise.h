@@ -162,7 +162,7 @@ protected:
         }
 
     }
-    // if fulfill/reject is running, block
+    // will block if fulfill/reject is running
     std::shared_ptr<promise> then(on_fullfilled_func f, on_rejected_func r)
     {
         std::lock_guard<std::mutex> lk(mtx);
@@ -170,7 +170,7 @@ protected:
         thens.emplace_back(f,r,promise_);
         return promise_;
     }
-    
+
 private:
     struct then_t{
         then_t(on_fullfilled_func on_fullfilled, on_rejected_func on_rejected, std::shared_ptr<promise> p) : on_fullfilled_(on_fullfilled), on_rejected_(on_rejected), promise_(p){}
