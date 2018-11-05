@@ -78,6 +78,17 @@ edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
 
+# Special rule for the target test
+test:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
+	/opt/local/bin/ctest --force-new-ctest-process $(ARGS)
+.PHONY : test
+
+# Special rule for the target test
+test/fast: test
+
+.PHONY : test/fast
+
 # The main all target
 all: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/wjp/Desktop/workspace/eventual/src/build/CMakeFiles /Users/wjp/Desktop/workspace/eventual/src/build/CMakeFiles/progress.marks
@@ -111,44 +122,56 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named testbed
+# Target rules for targets named eventual
 
 # Build rule for target.
-testbed: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 testbed
-.PHONY : testbed
+eventual: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 eventual
+.PHONY : eventual
 
 # fast build rule for target.
-testbed/fast:
-	$(MAKE) -f CMakeFiles/testbed.dir/build.make CMakeFiles/testbed.dir/build
-.PHONY : testbed/fast
+eventual/fast:
+	$(MAKE) -f eventual/CMakeFiles/eventual.dir/build.make eventual/CMakeFiles/eventual.dir/build
+.PHONY : eventual/fast
 
-test.o: test.cc.o
+#=============================================================================
+# Target rules for targets named gtest_main
 
-.PHONY : test.o
+# Build rule for target.
+gtest_main: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 gtest_main
+.PHONY : gtest_main
 
-# target to build an object file
-test.cc.o:
-	$(MAKE) -f CMakeFiles/testbed.dir/build.make CMakeFiles/testbed.dir/test.cc.o
-.PHONY : test.cc.o
+# fast build rule for target.
+gtest_main/fast:
+	$(MAKE) -f googletest/CMakeFiles/gtest_main.dir/build.make googletest/CMakeFiles/gtest_main.dir/build
+.PHONY : gtest_main/fast
 
-test.i: test.cc.i
+#=============================================================================
+# Target rules for targets named gtest
 
-.PHONY : test.i
+# Build rule for target.
+gtest: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 gtest
+.PHONY : gtest
 
-# target to preprocess a source file
-test.cc.i:
-	$(MAKE) -f CMakeFiles/testbed.dir/build.make CMakeFiles/testbed.dir/test.cc.i
-.PHONY : test.cc.i
+# fast build rule for target.
+gtest/fast:
+	$(MAKE) -f googletest/CMakeFiles/gtest.dir/build.make googletest/CMakeFiles/gtest.dir/build
+.PHONY : gtest/fast
 
-test.s: test.cc.s
+#=============================================================================
+# Target rules for targets named tests
 
-.PHONY : test.s
+# Build rule for target.
+tests: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 tests
+.PHONY : tests
 
-# target to generate assembly for a file
-test.cc.s:
-	$(MAKE) -f CMakeFiles/testbed.dir/build.make CMakeFiles/testbed.dir/test.cc.s
-.PHONY : test.cc.s
+# fast build rule for target.
+tests/fast:
+	$(MAKE) -f tests/CMakeFiles/tests.dir/build.make tests/CMakeFiles/tests.dir/build
+.PHONY : tests/fast
 
 # Help Target
 help:
@@ -158,10 +181,11 @@ help:
 	@echo "... depend"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
-	@echo "... testbed"
-	@echo "... test.o"
-	@echo "... test.i"
-	@echo "... test.s"
+	@echo "... test"
+	@echo "... eventual"
+	@echo "... gtest_main"
+	@echo "... gtest"
+	@echo "... tests"
 .PHONY : help
 
 

@@ -1,0 +1,32 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/wjp/Desktop/workspace/eventual/src/eventual/promise.cc
+promise.h
+/Users/wjp/Desktop/workspace/eventual/src/eventual/promise.h
+
+/Users/wjp/Desktop/workspace/eventual/src/eventual/promise.h
+functional
+-
+list
+-
+memory
+-
+zero_copy_value.hpp
+/Users/wjp/Desktop/workspace/eventual/src/eventual/zero_copy_value.hpp
+stdexcept
+-
+mutex
+-
+
+/Users/wjp/Desktop/workspace/eventual/src/eventual/zero_copy_value.hpp
+string
+-
+typeinfo
+-
+
