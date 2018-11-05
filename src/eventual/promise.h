@@ -29,13 +29,15 @@
 #include "zero_copy_value.hpp"
 
 /*
-Eventual: Promises/A+-conformant Async Programming Framework
+Eventual: A Promises/A+-conformant Async Programming Library
     
-    1. Library-provided operations (then, reject, and fulfill) are nonblocking; they will be completed asynchronously in background threads
+    1. Library-provided operations (then, reject, and fulfill) are nonblocking; they will be completed asynchronously in background threads.
+
+    2. A promise object is released shortly after being resolved (fulfilled or rejected).  
+
+    3. The life cycle of a promise object is automatically managed by the library. It's safe (actually recommended, if you don't need to append more then-s to it) for user code to tears down a promise immediately after its creation or before its resolution. 
     
-    2. The life cycle of eventual::promise_t is automatically managed by the library.
-    
-    3. It's safe (and cheap) to pass or store promise_t, value_t and reason_t by value, just like primitive types.
+    4. It's safe (and cheap) to pass, store and copy promise_t, value_t and reason_t by value, just like primitive types.
 */
 
 namespace eventual{
@@ -143,7 +145,7 @@ private:
         rejected =2
     };
     struct then_t; // tracks then-ed promises and their onfulfill/onreject callbacks
-    struct promise_meta_t; // status of promise
+    class promise_meta_t; // implementation details, should only be accessed by library
     std::shared_ptr<promise_meta_t> meta;
 };
 

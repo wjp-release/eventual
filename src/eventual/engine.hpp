@@ -42,13 +42,13 @@ public:
     void run_fulfill_asyncrhonously(std::shared_ptr<promise_meta_t> p, value_t v)
     {
         threadpool_->run([p, v]{  // ref capture is incorrect
-            p.fulfill(v); 
+            p->fulfill(v); 
         });
     }
     void run_reject_asyncrhonously(std::shared_ptr<promise_meta_t> p, reason_t r)
     {
         threadpool_->run([p, r]{
-            p.reject(r);
+            p->reject(r);
         });
     }   
 protected:
