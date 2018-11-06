@@ -34,10 +34,10 @@ meta(std::make_shared<promise_meta_t>())
     if(init==nullptr) throw std::runtime_error("promise init_func should not be nullptr!");
     init( 
         [this](value_t v){ 
-            promise_engine::instance().run_reject_asyncrhonously(meta, v);
+            meta->fulfill(v);
         },
         [this](reason_t r){ 
-            promise_engine::instance().run_reject_asyncrhonously(meta, r);
+            meta->reject(r);
         }
     );        
 }
