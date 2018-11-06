@@ -39,18 +39,22 @@ public:
         static promise_engine instance;
         return instance;
     }
-    void run_fulfill_asyncrhonously(std::shared_ptr<promise_meta_t> p, value_t v)
+    // void run_fulfill_asyncrhonously(std::shared_ptr<promise_meta_t> p, value_t v)
+    // {
+    //     threadpool_->run([p, v]{  // ref capture is incorrect
+    //         p->fulfill(v); 
+    //     });
+    // }
+    // void run_reject_asyncrhonously(std::shared_ptr<promise_meta_t> p, reason_t r)
+    // {
+    //     threadpool_->run([p, r]{
+    //         p->reject(r);
+    //     });
+    // }   
+    void run(std::function<void()> task_func)
     {
-        threadpool_->run([p, v]{  // ref capture is incorrect
-            p->fulfill(v); 
-        });
+        threadpool_->run(task_func);
     }
-    void run_reject_asyncrhonously(std::shared_ptr<promise_meta_t> p, reason_t r)
-    {
-        threadpool_->run([p, r]{
-            p->reject(r);
-        });
-    }   
 protected:
     promise_engine() : threadpool_(std::make_unique<threadpool>(NR_THREADS))
     {}

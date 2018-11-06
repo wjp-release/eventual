@@ -31,13 +31,13 @@
 /*
 Eventual: A Promises/A+-conformant Async Programming Library
     
-    1. Library-provided operations (then, reject, and fulfill) are nonblocking; they will be completed asynchronously in background threads.
+    1. Library-provided reject and fulfill are nonblocking operations; they will be completed asynchronously in background threads.
 
     2. A promise object is released shortly after being resolved (fulfilled or rejected).  
 
     3. The life cycle of a promise object is automatically managed by the library. It's safe (actually recommended, if you don't need to append more then-s to it) for user code to tears down a promise immediately after its creation or before its resolution. 
     
-    4. It's safe (and cheap) to pass, store and copy promise_t, value_t and reason_t by value, just like primitive types.
+    4. It's safe and cheap to pass, store and copy promise_t, value_t and reason_t by value, just like primitive types.
 */
 
 namespace eventual{
@@ -48,26 +48,7 @@ using reason_t = std::string; // it's efficient as long as you don't dump too mu
 class promise_t{
 public:
     // promise resolution procedure.
-    static void resolve(std::shared_ptr<promise_meta_t> p, value_t x)
-    {
-        // If x is a promise, it attempts to make promise adopt the state of x. 
-        if( x.has_same_type(typeid(promise_t)) )
-        {
-            promise_t promise_x=x.data<promise_t>();
-            // If x==promise, reject promise 
-            if(promise_x.meta==p){
-                promise_engine::instance().run_reject_asyncrhonously(p, reason_t("It's illogical for a promise to adopt the state of itself!"));
-                return;
-            }
-            // adopt the state of promise_x
-            // todo
-        }else{
-            // Otherwise, it fulfills promise with value_t x.
-            promise_engine::instance().run_fulfill_asyncrhonously(p,x);
-            return;
-        }
-    }
-
+    static void resolve(std::shared_ptr<promise_meta_t> p, value_t x);
 
     using func = std::function<void()>;
     // on fullfilled callback: should be provided by user via then
@@ -88,38 +69,8 @@ public:
     // create a rejected promise
     promise_t(reason_t r) : meta(std::make_shared<promise_meta_t>(v)){}
     // create a initial promise (pending; expose fulfill/reject operations to user code; runs user cb immediately)
-    promise_t(init_func init) : meta(std::make_shared<promise_meta_t>()){
-        if(init==nullptr) throw std::runtime_error("promise init_func should not be nullptr!");
-        init( 
-            [this](value_t v){ 
-                run_fulfill(meta, v);  
-            },
-            [this](reason_t r){ 
-                run_reject(meta, r);
-            }
-        );        
-    }
+    promise_t(init_func);
    
-    // return a promise that is pending (called by then()) 
-    static promise_t create_promise()
-    {
-        return std::make_shared<promise>();
-    }
-    // return a promise that is pending (immediately runs init_func) 
-    static promise_t create_promise(init_func init)
-    {
-        return std::make_shared<promise>(init);
-    }
-    // return a promise that is fulfilled with given value
-    static promise_t create_fulfilled_promise(value_t v)
-    {
-        return std::make_shared<promise>(v);
-    }
-    // return a promise that is rejected with given reason
-    static promise_t create_rejected_promise(reason_t r)
-    {
-        return std::make_shared<promise>(r);
-    }
 
     // assign/copy operations/ctors will increase meta's ref count by 1 rather than make an actual copy/clone of this object
     promise_t(const promise_t d) : meta(d.meta){}
