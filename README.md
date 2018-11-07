@@ -1,30 +1,69 @@
 # eventual
 
-Eventual is an asynchronous programming framework for modern C++.
+### promise_t
 
-### Promises/A+ in C++
+1. The eventual::promise_t does conform to Promises/A+ standard. 
 
-1. eventual::promise is an implementation that confirms Promises/A+, 
-    
-    1.1 with one little exception that eventual::promise does not try to assimilate nonconformant implementations of thenables. note that rule 2.3.3.1, 2.3.3.2, 2.3.3.3 does not apply to eventual::promise (see https://promisesaplus.com/)
-
-    1.2 javascript's value is weakly typed, hence value in Promises/A+ is implemented as a zero_copy_value class that can hold any type in C++.
-
-    1.3 users only have access to std::shared_ptrs of promises; they will be released automatically.
-
-2. dependencies: C++11, zero_copy_value.hpp
+2. But its main purpose is to help users write async code on their own rather than merely use existing async code in the current thread like what a promise does in Javascript.
 
 3. how to use: static link or compile from source
 
-4. drawbacks of promises: 
+4. drawbacks of promises as a proxy object for async programming: 
     
     4.1 promises are not cancellable nor sleepable
 
-    4.2 value_t introduces implicit couplings that C++ programmer must be very careful with
+    4.2 value_t introduces implicit couplings
 
-
-### Breakable Promises/C++
-
+```cpp
+    promise_t p1{[](promise_t::fulfill_func fulfill, promise_t::reject_func reject){
+      std::cout<<"try to get a connection\n";
+      this_thread::sleep_for(chrono::seconds(1));
+      int res=u(e);
+      if(res<1){
+        reject(reason_t("connection failed!"));
+      }else{
+        fulfill(value_t(res));
+      }
+    }};
+    auto p2=p1.then(
+      [](value_t v){
+        std::cout<<"now we get a connection! query something!\n";
+        this_thread::sleep_for(chrono::seconds(1));
+        int res=u(e);
+        if(res<1){
+          throw reason_t("query failed!");
+        }else{
+          return value_t(res);
+        }
+      }, 
+      [](reason_t r){
+        std::cout<<"fail to connect! try it again!\n";
+        int res=u(e);
+        if(res<1){
+          throw reason_t("connect failed!");
+        }else{
+          std::cout<<"now we get a connection! query something!\n";
+          int query_res=u(e);
+          if(query_res<1){
+            throw reason_t("query failed!");
+          }else{
+            return value_t(query_res);
+          }
+        }
+      }
+    );
+    std::cout<<"then defined, do something else\n";
+    auto p3=p2.then(
+      [](value_t v){
+        std::cout<<"good, result="<<v.data<int>()<<std::endl;
+        return v;
+      }, 
+      [](reason_t r){
+        std::cout<<"should handle different reasons here but fk it\n";
+        return value_t(-1);
+      }
+    );
+```
 
 
 ### zero_copy_value
