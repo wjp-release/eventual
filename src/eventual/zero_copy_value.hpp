@@ -141,7 +141,7 @@ private:
             return std::make_shared<meta_any_t<T>>(value);
         }
         // safest way to judge T's type
-        bool has_same_type(const std::type_info& rhs) const noexcept
+        bool has_same_type(const std::type_info& rhs) const noexcept override
         {
             return typeid(T)==rhs;
         }

@@ -21,7 +21,7 @@ public:
     using func=std::function<void()>;
     explicit threadpool(size_t nr_thread) : meta_(std::make_shared<meta>()) {
         for (size_t i = 0; i < nr_thread; i++) {
-            std::thread([meta_] {
+            std::thread([this]{
                 std::unique_lock<std::mutex> lk(meta_->mtx_);
                 for (;;) {
                     if (!meta_->tasks_.empty()) {

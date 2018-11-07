@@ -6,5 +6,5 @@ CXX_FLAGS = -fPIC  -O0 -Wall -g2 -ggdb   -std=gnu++14
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/Users/wjp/Desktop/workspace/eventual/src/./eventual -isystem /Users/wjp/Desktop/workspace/eventual/src/googletest/include -isystem /Users/wjp/Desktop/workspace/eventual/src/googletest 
+CXX_INCLUDES = -I/Users/wjp/Desktop/workspace/eventual/src/./eventual 
 

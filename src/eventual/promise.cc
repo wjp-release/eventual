@@ -24,28 +24,14 @@
  */
 
 #include "promise.h"
+#include <list>
 
 namespace eventual{
-
-// create a initial promise (pending; expose fulfill/reject operations to user code; runs user cb immediately)
-promise_t::promise_t(init_func init) : 
-meta(std::make_shared<promise_meta_t>())
-{
-    if(init==nullptr) throw std::runtime_error("promise init_func should not be nullptr!");
-    init( 
-        [this](value_t v){ 
-            meta->fulfill(v);
-        },
-        [this](reason_t r){ 
-            meta->reject(r);
-        }
-    );        
-}
 
 struct promise_t::then_t{
     then_t( on_fullfilled_func          on_fullfilled, 
             on_rejected_func            on_rejected, 
-            std::shared_ptr<promise_t>  p) : 
+            std::shared_ptr<promise_meta_t> p) : 
             on_fullfilled_(on_fullfilled), 
             on_rejected_(on_rejected), 
             promise_(p)
@@ -53,89 +39,8 @@ struct promise_t::then_t{
     on_fullfilled_func                  on_fullfilled_;
     on_rejected_func                    on_rejected_;
     std::shared_ptr<promise_meta_t>     promise_;
-    void trigger_on_reject()
-    {
-        // If onRejected is not a function and promise1 is rejected, promise2 must be rejected with the same reason as promise1.
-        if(on_rejected_==nullptr)
-        {
-            promise_->reject(r);
-            continue;
-        }
-        value_t x;
-        // If onRejected throws an exception e, promise2 must be rejected with e as the reason.
-        try{
-            x = on_rejected_(r);
-        }catch(const reason_t& reason){
-            promise_->reject(reason);
-            continue;
-        }catch(const std::exception& e){
-            reason_t reason(e.what());
-            promise_->reject(reason);
-            continue;
-        }catch(...){
-            promise_->reject(reason_t("unknown reason"));
-            continue;
-        }
-        // If onRejected returns a value x, run the Promise Resolution Procedure [[Resolve]](promise2, x).
-        resolve(promise_,x);
-    }
-    void trigger_on_fulfill()
-    {
-        // If onFulfilled is not a function and promise1 is fulfilled, promise2 must be fulfilled with the same value as promise1.
-        if(on_fullfilled_==nullptr)
-        {
-            promise_->fulfill(v);
-            continue;
-        }
-        value_t x;
-        // If onFulfilled throws an exception e, promise2 must be rejected with e as the reason.
-        try{
-            x = on_fullfilled_(v); // execute user code
-        }catch(const reason_t& reason){
-            promise_->reject(reason)
-            continue;
-        }catch(const std::exception& e){
-            reason_t reason(e.what());
-            promise_->reject(reason)
-            continue;
-        }catch(...){
-            promise_->reject(reason_t("unknown reason"))
-            continue;
-        }
-        // If onFulfilled returns a value x, run the Promise Resolution Procedure [[Resolve]](promise2, x).
-        resolve(promise_,x);
-    }
 };
 
-// promise resolution procedure
-void promise_t::resolve(std::shared_ptr<promise_meta_t> p, value_t value_x)
-{
-    // If x is a promise, it attempts to make promise adopt the state of x. 
-    if( x.has_same_type(typeid(promise_t)) )
-    {
-        std::shared_ptr<promise_meta_t> x= x.data<promise_t>().meta;
-        // If x==promise, reject promise 
-        if(x==p){
-            p->reject(reason_t("It's illogical for a promise to adopt the state of itself!"));
-            return;
-        }
-        // adopt the state of promise_x
-        // If x is pending, promise must remain pending until x is fulfilled or rejected.
-        // If/when x is fulfilled, fulfill promise with the same value.
-        // If/when x is rejected, reject promise with the same reason.
-        if(x->state==fulfilled) p->fulfill(x->value); 
-        else if(x->state==rejected) p->reject(x->reason);
-        else{
-            x->thens.emplace_back(nullptr, nullptr, p);
-        }
-    }else{
-        // Otherwise, it fulfills promise with value_t x.
-        p->fulfill(value_x);
-    }
-}
-
-
-// this object will survive untill its associated resolution procedure is completed even if its parent promise_t is destroyed by user. 
 class promise_t::promise_meta_t{
 private:
     state_t                             state = pending;
@@ -153,35 +58,31 @@ public:
     promise_meta_t(value_t v): state(fulfilled), value(v){}
     // create a rejected promise
     promise_meta_t(reason_t r): state(rejected), reason(r){}
-    // library-provided nonblocking operation to fulfill a promise 
+
     void fulfill(value_t v){
         std::lock_guard<std::mutex> lk(mtx);
         if(state!=pending) return;
         state=fulfilled;
         value=v;
-        // trigger all pending callbacks in BFS order asynchronously
-        promise_engine::instance().run([this]{
-            //If/when promise is fulfilled, all respective onFulfilled callbacks must execute in the order of their originating calls to then.
-            for(auto& t : thens ){  // thens does not need mutex protection since this promise has become immutable 
-                t.trigger_on_fulfill();
-            }
-        });
+        for(auto& t : thens ){   
+            promise_engine::instance().run([t,v]{
+                trigger_on_fulfill(t.promise_, t.on_fullfilled_,v);
+            });
+        }
     }
-    // library-provided nonblocking operation to reject a promise 
+
     void reject(reason_t r){
         std::lock_guard<std::mutex> lk(mtx);
         if(state!=pending) return;
         state=rejected;
         reason=r;
-        promise_engine::instance().run([this]{
-            // If/when promise is rejected, all respective onRejected callbacks must execute in the order of their originating calls to then.
-            for(auto& t : thens ){ 
-                t.trigger_on_reject();
-            }
-        });
+        for(auto& t : thens ){   
+            promise_engine::instance().run([t,r]{
+                trigger_on_reject(t.promise_, t.on_rejected_, r);
+            });
+        }
     }
-    // if this promise is being fulfilled/rejected, this function will block until the promise is resolved
-    // if this promise has been resolved, it should stop emplacing new then_t-s, callbacks of then calls should be triggered immediately
+
     std::shared_ptr<promise_meta_t> then(on_fullfilled_func f, on_rejected_func r)
     {
         std::unique_lock<std::mutex> lk(mtx);
@@ -189,18 +90,123 @@ public:
         if(state==pending) 
             thens.emplace_back(f,r,promise_);
         else if(state==rejected) 
-            promise_engine::instance().run([f,r,promise_]{
-                then_t(f,r,promise_).trigger_on_reject();
+            promise_engine::instance().run([r,promise_,cur_r=reason]{
+                trigger_on_reject(promise_, r, cur_r);
             });
         else
-            promise_engine::instance().run([f,r,promise_]{
-                then_t(f,r,promise_).trigger_on_fulfill();
+            promise_engine::instance().run([f,promise_,cur_v=value]{
+                trigger_on_fulfill(promise_, f, cur_v);
             });
         return promise_;
     }
 
+    void adopted_by(std::shared_ptr<promise_meta_t> p)
+    {
+        std::lock_guard<std::mutex> lk(mtx);
+        if(state==fulfilled) p->fulfill(value); 
+        else if(state==rejected) p->reject(reason);
+        else{
+            thens.emplace_back(nullptr, nullptr, p);
+        }
+    }
 };
 
+
+// promise resolution procedure: If x is a promise, it attempts to make promise adopt the state of x. 
+void promise_t::resolve(std::shared_ptr<promise_meta_t> p, value_t value_x)
+{
+    if( value_x.has_same_type(typeid(promise_t)) )
+    {
+        std::shared_ptr<promise_meta_t> x= value_x.data<promise_t>().meta;
+        if(x==p){
+            p->reject(reason_t("It's illogical for a promise to adopt the state of itself!"));
+            return;
+        }
+        x->adopted_by(p);//will block if x is now being fulfilled/rejected
+    }else{
+        p->fulfill(value_x);
+    }
+}
+
+promise_t promise_t::then(on_fullfilled_func f, on_rejected_func r)
+{
+    return promise_t(meta->then(f,r));
+}
+
+
+// create a initial promise 
+promise_t::promise_t(init_func init) : 
+meta(std::make_shared<promise_meta_t>())
+{
+    if(init==nullptr) throw std::runtime_error("promise init_func should not be nullptr!");
+    init( 
+        [this](value_t v){ 
+            meta->fulfill(v);
+        },
+        [this](reason_t r){ 
+            meta->reject(r);
+        }
+    );        
+}
+
+void promise_t::trigger_on_reject(std::shared_ptr<promise_meta_t> promise_, on_rejected_func on_rejected_, reason_t r)
+{
+    if(on_rejected_==nullptr)
+    {
+        promise_->reject(r);
+        return;
+    }
+    value_t x;
+    try{
+        x = on_rejected_(r);
+    }catch(const reason_t& reason){
+        promise_->reject(reason);
+        return;
+    }catch(const std::exception& e){
+        reason_t reason(e.what());
+        promise_->reject(reason);
+        return;
+    }catch(...){
+        promise_->reject(reason_t("unknown reason"));
+        return;
+    }
+    resolve(promise_,x);
+}
+
+
+void promise_t::trigger_on_fulfill(std::shared_ptr<promise_meta_t> promise_, on_fullfilled_func on_fullfilled_, value_t v)
+{
+    if(on_fullfilled_==nullptr)
+    {
+        promise_->fulfill(v);
+        return;
+    }
+    value_t x;
+    try{
+        x = on_fullfilled_(v); // execute user code
+    }catch(const reason_t& reason){
+        promise_->reject(reason);
+        return;
+    }catch(const std::exception& e){
+        reason_t reason(e.what());
+        promise_->reject(reason);
+        return;
+    }catch(...){
+        promise_->reject(reason_t("unknown reason"));
+        return;
+    }
+    resolve(promise_,x);
+}
+
+promise_t promise_t::create_fulfilled_promise(value_t v)
+{
+    return std::make_shared<promise_meta_t>(v);
+}
+
+promise_t promise_t::create_rejected_promise(reason_t r)
+{
+    return std::make_shared<promise_meta_t>(r);
+}
 
 }
 

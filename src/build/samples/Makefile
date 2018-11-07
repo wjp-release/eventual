@@ -78,27 +78,16 @@ edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
 
-# Special rule for the target test
-test:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
-	/opt/local/bin/ctest --force-new-ctest-process $(ARGS)
-.PHONY : test
-
-# Special rule for the target test
-test/fast: test
-
-.PHONY : test/fast
-
 # The main all target
 all: cmake_check_build_system
-	cd /Users/wjp/Desktop/workspace/eventual/src/build && $(CMAKE_COMMAND) -E cmake_progress_start /Users/wjp/Desktop/workspace/eventual/src/build/CMakeFiles /Users/wjp/Desktop/workspace/eventual/src/build/tests/CMakeFiles/progress.marks
-	cd /Users/wjp/Desktop/workspace/eventual/src/build && $(MAKE) -f CMakeFiles/Makefile2 tests/all
+	cd /Users/wjp/Desktop/workspace/eventual/src/build && $(CMAKE_COMMAND) -E cmake_progress_start /Users/wjp/Desktop/workspace/eventual/src/build/CMakeFiles /Users/wjp/Desktop/workspace/eventual/src/build/samples/CMakeFiles/progress.marks
+	cd /Users/wjp/Desktop/workspace/eventual/src/build && $(MAKE) -f CMakeFiles/Makefile2 samples/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/wjp/Desktop/workspace/eventual/src/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /Users/wjp/Desktop/workspace/eventual/src/build && $(MAKE) -f CMakeFiles/Makefile2 tests/clean
+	cd /Users/wjp/Desktop/workspace/eventual/src/build && $(MAKE) -f CMakeFiles/Makefile2 samples/clean
 .PHONY : clean
 
 # The main clean target
@@ -108,12 +97,12 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /Users/wjp/Desktop/workspace/eventual/src/build && $(MAKE) -f CMakeFiles/Makefile2 tests/preinstall
+	cd /Users/wjp/Desktop/workspace/eventual/src/build && $(MAKE) -f CMakeFiles/Makefile2 samples/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /Users/wjp/Desktop/workspace/eventual/src/build && $(MAKE) -f CMakeFiles/Makefile2 tests/preinstall
+	cd /Users/wjp/Desktop/workspace/eventual/src/build && $(MAKE) -f CMakeFiles/Makefile2 samples/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
@@ -122,73 +111,46 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
-tests/CMakeFiles/tests.dir/rule:
-	cd /Users/wjp/Desktop/workspace/eventual/src/build && $(MAKE) -f CMakeFiles/Makefile2 tests/CMakeFiles/tests.dir/rule
-.PHONY : tests/CMakeFiles/tests.dir/rule
+samples/CMakeFiles/sample.dir/rule:
+	cd /Users/wjp/Desktop/workspace/eventual/src/build && $(MAKE) -f CMakeFiles/Makefile2 samples/CMakeFiles/sample.dir/rule
+.PHONY : samples/CMakeFiles/sample.dir/rule
 
 # Convenience name for target.
-tests: tests/CMakeFiles/tests.dir/rule
+sample: samples/CMakeFiles/sample.dir/rule
 
-.PHONY : tests
+.PHONY : sample
 
 # fast build rule for target.
-tests/fast:
-	cd /Users/wjp/Desktop/workspace/eventual/src/build && $(MAKE) -f tests/CMakeFiles/tests.dir/build.make tests/CMakeFiles/tests.dir/build
-.PHONY : tests/fast
+sample/fast:
+	cd /Users/wjp/Desktop/workspace/eventual/src/build && $(MAKE) -f samples/CMakeFiles/sample.dir/build.make samples/CMakeFiles/sample.dir/build
+.PHONY : sample/fast
 
-test_todo.o: test_todo.cc.o
+sample.o: sample.cc.o
 
-.PHONY : test_todo.o
-
-# target to build an object file
-test_todo.cc.o:
-	cd /Users/wjp/Desktop/workspace/eventual/src/build && $(MAKE) -f tests/CMakeFiles/tests.dir/build.make tests/CMakeFiles/tests.dir/test_todo.cc.o
-.PHONY : test_todo.cc.o
-
-test_todo.i: test_todo.cc.i
-
-.PHONY : test_todo.i
-
-# target to preprocess a source file
-test_todo.cc.i:
-	cd /Users/wjp/Desktop/workspace/eventual/src/build && $(MAKE) -f tests/CMakeFiles/tests.dir/build.make tests/CMakeFiles/tests.dir/test_todo.cc.i
-.PHONY : test_todo.cc.i
-
-test_todo.s: test_todo.cc.s
-
-.PHONY : test_todo.s
-
-# target to generate assembly for a file
-test_todo.cc.s:
-	cd /Users/wjp/Desktop/workspace/eventual/src/build && $(MAKE) -f tests/CMakeFiles/tests.dir/build.make tests/CMakeFiles/tests.dir/test_todo.cc.s
-.PHONY : test_todo.cc.s
-
-test_zero_copy_value.o: test_zero_copy_value.cc.o
-
-.PHONY : test_zero_copy_value.o
+.PHONY : sample.o
 
 # target to build an object file
-test_zero_copy_value.cc.o:
-	cd /Users/wjp/Desktop/workspace/eventual/src/build && $(MAKE) -f tests/CMakeFiles/tests.dir/build.make tests/CMakeFiles/tests.dir/test_zero_copy_value.cc.o
-.PHONY : test_zero_copy_value.cc.o
+sample.cc.o:
+	cd /Users/wjp/Desktop/workspace/eventual/src/build && $(MAKE) -f samples/CMakeFiles/sample.dir/build.make samples/CMakeFiles/sample.dir/sample.cc.o
+.PHONY : sample.cc.o
 
-test_zero_copy_value.i: test_zero_copy_value.cc.i
+sample.i: sample.cc.i
 
-.PHONY : test_zero_copy_value.i
+.PHONY : sample.i
 
 # target to preprocess a source file
-test_zero_copy_value.cc.i:
-	cd /Users/wjp/Desktop/workspace/eventual/src/build && $(MAKE) -f tests/CMakeFiles/tests.dir/build.make tests/CMakeFiles/tests.dir/test_zero_copy_value.cc.i
-.PHONY : test_zero_copy_value.cc.i
+sample.cc.i:
+	cd /Users/wjp/Desktop/workspace/eventual/src/build && $(MAKE) -f samples/CMakeFiles/sample.dir/build.make samples/CMakeFiles/sample.dir/sample.cc.i
+.PHONY : sample.cc.i
 
-test_zero_copy_value.s: test_zero_copy_value.cc.s
+sample.s: sample.cc.s
 
-.PHONY : test_zero_copy_value.s
+.PHONY : sample.s
 
 # target to generate assembly for a file
-test_zero_copy_value.cc.s:
-	cd /Users/wjp/Desktop/workspace/eventual/src/build && $(MAKE) -f tests/CMakeFiles/tests.dir/build.make tests/CMakeFiles/tests.dir/test_zero_copy_value.cc.s
-.PHONY : test_zero_copy_value.cc.s
+sample.cc.s:
+	cd /Users/wjp/Desktop/workspace/eventual/src/build && $(MAKE) -f samples/CMakeFiles/sample.dir/build.make samples/CMakeFiles/sample.dir/sample.cc.s
+.PHONY : sample.cc.s
 
 # Help Target
 help:
@@ -198,14 +160,10 @@ help:
 	@echo "... depend"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
-	@echo "... test"
-	@echo "... tests"
-	@echo "... test_todo.o"
-	@echo "... test_todo.i"
-	@echo "... test_todo.s"
-	@echo "... test_zero_copy_value.o"
-	@echo "... test_zero_copy_value.i"
-	@echo "... test_zero_copy_value.s"
+	@echo "... sample"
+	@echo "... sample.o"
+	@echo "... sample.i"
+	@echo "... sample.s"
 .PHONY : help
 
 

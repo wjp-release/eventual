@@ -35,8 +35,7 @@ endif()
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("/Users/wjp/Desktop/workspace/eventual/src/build/eventual/cmake_install.cmake")
-  include("/Users/wjp/Desktop/workspace/eventual/src/build/googletest/cmake_install.cmake")
-  include("/Users/wjp/Desktop/workspace/eventual/src/build/tests/cmake_install.cmake")
+  include("/Users/wjp/Desktop/workspace/eventual/src/build/samples/cmake_install.cmake")
 
 endif()
 

@@ -1,4 +1,4 @@
-# Install script for directory: /Users/wjp/Desktop/workspace/eventual/src/googletest
+# Install script for directory: /Users/wjp/Desktop/workspace/eventual/src/samples
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

@@ -12,9 +12,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "CMakeFiles/3.12.1/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.12.1/CMakeSystem.cmake"
   "../eventual/CMakeLists.txt"
-  "../googletest/CMakeLists.txt"
-  "../googletest/cmake/internal_utils.cmake"
-  "../tests/CMakeLists.txt"
+  "../samples/CMakeLists.txt"
   "/opt/local/share/cmake-3.12/Modules/CMakeCInformation.cmake"
   "/opt/local/share/cmake-3.12/Modules/CMakeCXXInformation.cmake"
   "/opt/local/share/cmake-3.12/Modules/CMakeCommonLanguageInclude.cmake"
@@ -23,18 +21,11 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/opt/local/share/cmake-3.12/Modules/CMakeLanguageInformation.cmake"
   "/opt/local/share/cmake-3.12/Modules/CMakeSystemSpecificInformation.cmake"
   "/opt/local/share/cmake-3.12/Modules/CMakeSystemSpecificInitialize.cmake"
-  "/opt/local/share/cmake-3.12/Modules/CheckIncludeFile.cmake"
-  "/opt/local/share/cmake-3.12/Modules/CheckLibraryExists.cmake"
-  "/opt/local/share/cmake-3.12/Modules/CheckSymbolExists.cmake"
   "/opt/local/share/cmake-3.12/Modules/Compiler/AppleClang-C.cmake"
   "/opt/local/share/cmake-3.12/Modules/Compiler/AppleClang-CXX.cmake"
   "/opt/local/share/cmake-3.12/Modules/Compiler/CMakeCommonCompilerMacros.cmake"
   "/opt/local/share/cmake-3.12/Modules/Compiler/Clang.cmake"
   "/opt/local/share/cmake-3.12/Modules/Compiler/GNU.cmake"
-  "/opt/local/share/cmake-3.12/Modules/FindPackageHandleStandardArgs.cmake"
-  "/opt/local/share/cmake-3.12/Modules/FindPackageMessage.cmake"
-  "/opt/local/share/cmake-3.12/Modules/FindPythonInterp.cmake"
-  "/opt/local/share/cmake-3.12/Modules/FindThreads.cmake"
   "/opt/local/share/cmake-3.12/Modules/Platform/Apple-AppleClang-C.cmake"
   "/opt/local/share/cmake-3.12/Modules/Platform/Apple-AppleClang-CXX.cmake"
   "/opt/local/share/cmake-3.12/Modules/Platform/Apple-Clang-C.cmake"
@@ -55,14 +46,11 @@ set(CMAKE_MAKEFILE_OUTPUTS
 set(CMAKE_MAKEFILE_PRODUCTS
   "CMakeFiles/CMakeDirectoryInformation.cmake"
   "eventual/CMakeFiles/CMakeDirectoryInformation.cmake"
-  "googletest/CMakeFiles/CMakeDirectoryInformation.cmake"
-  "tests/CMakeFiles/CMakeDirectoryInformation.cmake"
+  "samples/CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
   "eventual/CMakeFiles/eventual.dir/DependInfo.cmake"
-  "googletest/CMakeFiles/gtest_main.dir/DependInfo.cmake"
-  "googletest/CMakeFiles/gtest.dir/DependInfo.cmake"
-  "tests/CMakeFiles/tests.dir/DependInfo.cmake"
+  "samples/CMakeFiles/sample.dir/DependInfo.cmake"
   )

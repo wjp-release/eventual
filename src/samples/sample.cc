@@ -1,12 +1,6 @@
 #include "todo.hpp"
 #include "zero_copy_value.hpp"
-#include <iostream>
-#include <chrono>
-#include <thread>
-#include <random>
-
-using namespace eventual;
-using namespace std;
+#include "sample.h"
 
 // dummy service routines that simulate background threads or threadpools that actually complete the async tasks
 
@@ -17,8 +11,6 @@ void dummy_service_routine(todo td)
     td.wake();
 }
 
-uniform_int_distribution<unsigned> u(0,9);
-default_random_engine e;
 
 void dummy_service_routine_sometimes_reject(todo td)
 {
@@ -218,8 +210,9 @@ void test_zero_copy_value()
 
 int main()
 {
-    test3();
-
+    promise1();
+    cout<<"sample ends\n";
     cin.get();
+    cout<<"program ends\n";
     return 0;
 }
